@@ -1,4 +1,4 @@
-package requestworker
+package requestwork
 
 import (
 	"net/http"
