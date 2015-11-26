@@ -1,4 +1,4 @@
-# requestworker
+# requestwork
 
 a lib for go to batch processing send web request
 
