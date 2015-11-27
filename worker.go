@@ -19,6 +19,9 @@ func (w *Worker) run() {
 	for j := range w.JobQuene {
 		res, err := w.HttpClient.Do(j.Resq)
 		j.Command(res, err)
+		if err != nil {
+			continue
+		}
 		res.Body.Close()
 	}
 
