@@ -5,7 +5,7 @@ import (
 )
 
 type Job struct {
-	Resq    *http.Request
+	Req     *http.Request
 	Command func(resp *http.Response, err error)
 }
 
@@ -17,7 +17,7 @@ type Worker struct {
 
 func (w *Worker) run() {
 	for j := range w.JobQuene {
-		res, err := w.HttpClient.Do(j.Resq)
+		res, err := w.HttpClient.Do(j.Req)
 		j.Command(res, err)
 		if err != nil {
 			continue
