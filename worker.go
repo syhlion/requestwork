@@ -14,33 +14,45 @@ type result struct {
 	err  error
 }
 
-type Worker struct {
-	JobQuene   chan *job
-	Threads    int
-	HttpClient *http.Client
+func New(httpClient *http.Client, threads int) *Worker {
+
+	w := &Worker{
+		jobQuene:   make(chan *job),
+		threads:    threads,
+		httpClient: httpClient,
+	}
+	go w.start()
+	return w
+
 }
 
-func (w *Worker) Excuste(req *http.Request) (resp *http.Response, err error) {
+type Worker struct {
+	jobQuene   chan *job
+	threads    int
+	httpClient *http.Client
+}
+
+func (w *Worker) Execute(req *http.Request) (resp *http.Response, err error) {
 	j := &job{req, make(chan result)}
 
-	w.JobQuene <- j
+	w.jobQuene <- j
 	r := <-j.end
 	return r.resp, r.err
 
 }
 
 func (w *Worker) run() {
-	for j := range w.JobQuene {
-		resp, err := w.HttpClient.Do(j.req)
+	for j := range w.jobQuene {
+		resp, err := w.httpClient.Do(j.req)
 		j.end <- result{resp, err}
 		close(j.end)
 	}
 
 }
 
-func (w *Worker) Start() {
+func (w *Worker) start() {
 
-	for i := 0; i < w.Threads; i++ {
+	for i := 0; i < w.threads; i++ {
 		go w.run()
 	}
 
