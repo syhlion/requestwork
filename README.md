@@ -12,32 +12,18 @@ a lib for go to batch processing send web request
 
 func main() {
 
-    // Init Job
-    j := &requestwork.Job{}
+    // Init request
     resq, err := http.NewRequest("GET", "http://tw.yahoo.com", nil)
     if err != nil {
         panic(err)
     }
-    j.Resq = resq
-    result := make(chan string)
-    j.Command = func(resp *http.Response, err error) {
-        if err != nil {
-            return
-        }
-        b, err := ioutil.ReadAll(resp.Body)
-        result <- string(b)
+    resp,err:=worker:=requestwork.New(resq)
 
+    if err != nil {
+        panic(err)
     }
 
-    // Init Worker
-    w := &requestwork.Worker{
-            JobQuene:   make(chan *requestwork.Job),
-            Threads:    5,
-            HttpClient: &http.Client{},
-    }
-    go w.Start()
-    w.JobQuene <- j
-    println(<-result)
+    defer resp.Body.Close()
     fmt.Println("end")
 }
 
