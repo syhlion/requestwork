@@ -4,25 +4,36 @@ import (
 	"net/http"
 )
 
-type Job struct {
-	Req     *http.Request
-	Command func(resp *http.Response, err error)
+type job struct {
+	req *http.Request
+	end chan result
+}
+
+type result struct {
+	resp *http.Response
+	err  error
 }
 
 type Worker struct {
-	JobQuene   chan *Job
+	JobQuene   chan *job
 	Threads    int
 	HttpClient *http.Client
 }
 
+func (w *Worker) Excuste(req *http.Request) (resp *http.Response, err error) {
+	j := &job{req, make(chan result)}
+
+	w.JobQuene <- j
+	r := <-j.end
+	return r.resp, r.err
+
+}
+
 func (w *Worker) run() {
 	for j := range w.JobQuene {
-		res, err := w.HttpClient.Do(j.Req)
-		j.Command(res, err)
-		if err != nil {
-			continue
-		}
-		res.Body.Close()
+		resp, err := w.HttpClient.Do(j.req)
+		j.end <- result{resp, err}
+		close(j.end)
 	}
 
 }
