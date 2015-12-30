@@ -1,4 +1,5 @@
 # requestwork
+[![Build Status](https://travis-ci.org/syhlion/requestwork.svg?branch=master)](https://travis-ci.org/syhlion/requestwork)
 
 a lib for go to batch processing send web request
 
