@@ -6,7 +6,7 @@ import (
 )
 
 func TestExecute(t *testing.T) {
-	req, err := http.NewRequest("GET", "http://www.google.com.tw", nil)
+	req, err := http.NewRequest("GET", "http://tw.yahoo.com", nil)
 	if err != nil {
 		t.Error("request error: ", err)
 	}
